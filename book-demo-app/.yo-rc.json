@@ -1,0 +1,39 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.mynotes.demo.jhipster"
+    },
+    "jhipsterVersion": "6.10.5",
+    "applicationType": "monolith",
+    "baseName": "bookapp",
+    "packageName": "com.mynotes.demo.jhipster",
+    "packageFolder": "com/mynotes/demo/jhipster",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Memory",
+    "prodDatabaseType": "mysql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": "eureka",
+    "buildTool": "maven",
+    "enableSwaggerCodegen": true,
+    "jwtSecretKey": "NzQyZjkyN2ZkY2U2ODRjMGIwNDJjMWJjYzk4MDNiODI1ODQ0ZjcxMzY2NmNlOThkMmVlN2I0YjFkNTc5MGQ5YTE1ZmIzYTY0OWRiNTM4ZTRhMGJkMzQ1YjU0ZThiN2VjYzA1ZjIzNTc3Njk1OGFlODI1ZTgyMzIwNDM0NzJjN2M=",
+    "embeddableLaunchScript": false,
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "clientFramework": "angularX",
+    "clientTheme": "solar",
+    "clientThemeVariant": "dark",
+    "creationTimestamp": 1611970163736,
+    "testFrameworks": ["gatling"],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "blueprints": []
+  }
+}
