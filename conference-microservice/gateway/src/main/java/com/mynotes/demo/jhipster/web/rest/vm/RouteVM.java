@@ -1,7 +1,6 @@
 package com.mynotes.demo.jhipster.web.rest.vm;
 
 import java.util.List;
-
 import org.springframework.cloud.client.ServiceInstance;
 
 /**

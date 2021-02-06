@@ -2,8 +2,9 @@ package com.mynotes.demo.jhipster.web.rest;
 
 import com.mynotes.demo.jhipster.security.SecurityUtils;
 import com.mynotes.demo.jhipster.service.UserService;
+import com.mynotes.demo.jhipster.service.dto.AdminUserDTO;
 import com.mynotes.demo.jhipster.service.dto.UserDTO;
-
+import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.security.Principal;
 
 /**
  * REST controller for managing the current user's account.
@@ -47,7 +46,7 @@ public class AccountResource {
      */
     @GetMapping("/account")
     @SuppressWarnings("unchecked")
-    public Mono<UserDTO> getAccount(Principal principal) {
+    public Mono<AdminUserDTO> getAccount(Principal principal) {
         if (principal instanceof AbstractAuthenticationToken) {
             return userService.getUserFromAuthentication((AbstractAuthenticationToken) principal);
         } else {

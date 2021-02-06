@@ -4,38 +4,28 @@
     {
       "fieldName": "firstName",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "lastName",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "email",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "twitter",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "bio",
       "fieldType": "byte[]",
       "fieldTypeBlobContent": "any",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     }
   ],
   "relationships": [
@@ -44,11 +34,9 @@
       "otherEntityName": "session",
       "otherEntityRelationshipName": "speakers",
       "relationshipName": "sessions",
-      "otherEntityField": "id",
       "ownerSide": true
     }
   ],
-  "changelogDate": "20210206155934",
   "entityTableName": "speaker",
   "dto": "no",
   "pagination": "no",
@@ -57,7 +45,9 @@
   "fluentMethods": true,
   "readOnly": false,
   "embedded": false,
-  "clientRootFolder": "",
   "applications": "*",
-  "microserviceName": "conference"
+  "microserviceName": "conference",
+  "clientRootFolder": "conference",
+  "databaseType": "no",
+  "changelogDate": "20210206204600"
 }

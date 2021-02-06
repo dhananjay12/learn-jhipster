@@ -1,0 +1,10 @@
+{
+  "generator-jhipster": {
+    "appsFolders": ["conference", "gateway"],
+    "directoryPath": "../",
+    "gatewayType": "zuul",
+    "monitoring": "no",
+    "serviceDiscoveryType": "eureka",
+    "jwtSecretKey": "YzQ0ZTA4M2I5MWVkZGFmODA4NzkwNTc0NDJhZmI4NzlhZjVlYWM5ZWNkZTE3ODUzNGYzNGUzMDFjZDUzNmQ0Yjg4OGY0YmFhYWFmYTY1MWQ4NzFjYzFjN2VmYzRjMmVlNjI2ZA=="
+  }
+}

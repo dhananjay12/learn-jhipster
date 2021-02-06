@@ -1,38 +1,35 @@
 package com.mynotes.demo.jhipster.web.rest;
 
-import com.mynotes.demo.jhipster.GatewayApp;
+import static com.mynotes.demo.jhipster.web.rest.AccountResourceIT.TEST_USER_LOGIN;
+import static com.mynotes.demo.jhipster.web.rest.TestUtil.ID_TOKEN;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import com.mynotes.demo.jhipster.IntegrationTest;
 import com.mynotes.demo.jhipster.config.TestSecurityConfiguration;
 import com.mynotes.demo.jhipster.security.AuthoritiesConstants;
 import com.mynotes.demo.jhipster.service.UserService;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.test.web.reactive.server.WebTestClient;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.mynotes.demo.jhipster.web.rest.AccountResourceIT.TEST_USER_LOGIN;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static com.mynotes.demo.jhipster.web.rest.TestUtil.ID_TOKEN;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * Integration tests for the {@link AccountResource} REST controller.
  */
 @AutoConfigureWebTestClient
 @WithMockUser(value = TEST_USER_LOGIN)
-@SpringBootTest(classes = {GatewayApp.class, TestSecurityConfiguration.class})
-public class AccountResourceIT {
+@IntegrationTest
+class AccountResourceIT {
 
     static final String TEST_USER_LOGIN = "test";
 
@@ -47,31 +44,33 @@ public class AccountResourceIT {
         claims.put("groups", Collections.singletonList(AuthoritiesConstants.ADMIN));
         claims.put("sub", "jane");
         claims.put("email", "jane.doe@jhipster.com");
-        this.idToken = new OidcIdToken(ID_TOKEN, Instant.now(),
-            Instant.now().plusSeconds(60), claims);
+        this.idToken = new OidcIdToken(ID_TOKEN, Instant.now(), Instant.now().plusSeconds(60), claims);
     }
 
     @Test
-    public void testGetExistingAccount() {
+    void testGetExistingAccount() {
         webTestClient
             .mutateWith(mockAuthentication(TestUtil.authenticationToken(idToken)))
             .mutateWith(csrf())
-            .get().uri("/api/account")
+            .get()
+            .uri("/api/account")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
             .expectBody()
-            .jsonPath("$.login").isEqualTo("jane")
-            .jsonPath("$.email").isEqualTo("jane.doe@jhipster.com")
-            .jsonPath("$.authorities").isEqualTo(AuthoritiesConstants.ADMIN);
+            .jsonPath("$.login")
+            .isEqualTo("jane")
+            .jsonPath("$.email")
+            .isEqualTo("jane.doe@jhipster.com")
+            .jsonPath("$.authorities")
+            .isEqualTo(AuthoritiesConstants.ADMIN);
     }
 
     @Test
-    public void testGetUnknownAccount() {
-        webTestClient.get().uri("/api/account")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus().is5xxServerError();
+    void testGetUnknownAccount() {
+        webTestClient.get().uri("/api/account").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().is5xxServerError();
     }
 }

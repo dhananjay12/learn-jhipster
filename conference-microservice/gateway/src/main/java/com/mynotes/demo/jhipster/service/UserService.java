@@ -1,8 +1,10 @@
 package com.mynotes.demo.jhipster.service;
 
 import com.mynotes.demo.jhipster.config.Constants;
+import com.mynotes.demo.jhipster.service.dto.AdminUserDTO;
 import com.mynotes.demo.jhipster.service.dto.UserDTO;
-
+import java.util.*;
+import java.util.stream.Collectors;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -12,21 +14,19 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * Service class for managing users.
  */
 @Service
 public class UserService {
+
     /**
      * Returns the user from an OAuth 2.0 login or resource server with JWT.
      *
      * @param authToken the authentication token.
      * @return the user from the authentication.
      */
-    public Mono<UserDTO> getUserFromAuthentication(AbstractAuthenticationToken authToken) {
+    public Mono<AdminUserDTO> getUserFromAuthentication(AbstractAuthenticationToken authToken) {
         Map<String, Object> attributes;
         if (authToken instanceof OAuth2AuthenticationToken) {
             attributes = ((OAuth2AuthenticationToken) authToken).getPrincipal().getAttributes();
@@ -35,15 +35,13 @@ public class UserService {
         } else {
             throw new IllegalArgumentException("AuthenticationToken is not OAuth2 or JWT!");
         }
-        UserDTO user = getUser(attributes);
-        user.setAuthorities(authToken.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.toSet()));
+        AdminUserDTO user = getUser(attributes);
+        user.setAuthorities(authToken.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()));
         return Mono.just(user);
     }
 
-    private static UserDTO getUser(Map<String, Object> details) {
-        UserDTO user = new UserDTO();
+    private static AdminUserDTO getUser(Map<String, Object> details) {
+        AdminUserDTO user = new AdminUserDTO();
         // handle resource server JWT, where sub claim is email and uid is ID
         if (details.get("uid") != null) {
             user.setId((String) details.get("uid"));

@@ -4,31 +4,23 @@
     {
       "fieldName": "title",
       "fieldType": "String",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "description",
       "fieldType": "byte[]",
       "fieldTypeBlobContent": "any",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "startDateTime",
       "fieldType": "ZonedDateTime",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "endDateTime",
       "fieldType": "ZonedDateTime",
-      "fieldValidateRules": [
-        "required"
-      ]
+      "fieldValidateRules": ["required"]
     }
   ],
   "relationships": [
@@ -37,11 +29,9 @@
       "otherEntityName": "speaker",
       "otherEntityRelationshipName": "sessions",
       "relationshipName": "speakers",
-      "otherEntityField": "id",
       "ownerSide": false
     }
   ],
-  "changelogDate": "20210206160034",
   "entityTableName": "session",
   "dto": "no",
   "pagination": "no",
@@ -50,7 +40,9 @@
   "fluentMethods": true,
   "readOnly": false,
   "embedded": false,
-  "clientRootFolder": "",
   "applications": "*",
-  "microserviceName": "conference"
+  "microserviceName": "conference",
+  "clientRootFolder": "conference",
+  "databaseType": "no",
+  "changelogDate": "20210206204601"
 }
