@@ -29,19 +29,12 @@ spring:
   jackson:
     serialization:
       write-durations-as-timestamps: false
-  liquibase:
-    contexts: test
-    url: jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
   mail:
     host: localhost
   main:
     allow-bean-definition-overriding: true
   messages:
     basename: i18n/messages
-  r2dbc:
-    url: r2dbc:h2:mem:///gateway?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: r2dbc
-    password:
   task:
     execution:
       thread-name-prefix: gateway-task-
@@ -55,6 +48,13 @@ spring:
         size: 1
   thymeleaf:
     mode: HTML
+  # Allow SecurityConfiguration to initialize w/o specifying an empty issuer-uri is OK
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: http://DO_NOT_CALL:9080/auth/realms/jhipster
 
 server:
   port: 10344
@@ -80,13 +80,6 @@ jhipster:
   mail:
     from: test@localhost
     base-url: http://127.0.0.1:8080
-  security:
-    authentication:
-      jwt:
-        # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
-        base64-secret: MTgzMDhmZDAzN2Y4NzMxYTMzOGM1YmVhNjcyN2M3NTBjNmY5NzVhMzliMjMyMTI3MzExNTQ5OTI0MWU3ZmQ2Mjc4YmIyMGM5M2I1OTExYzRiOTdhM2JiOWEwYjczOGZiYjFlMDZjZmU1NmM4OWQyZGE2Mzg5OTg3NGVlZDI5YjI=
-        # Token is valid 24 hours
-        token-validity-in-seconds: 86400
   metrics:
     logs: # Reports metrics in the logs
       enabled: true

@@ -1,26 +1,45 @@
 package com.mynotes.demo.jhipster.config;
 
 import com.mynotes.demo.jhipster.security.AuthoritiesConstants;
-import com.mynotes.demo.jhipster.security.jwt.JWTFilter;
-import com.mynotes.demo.jhipster.security.jwt.TokenProvider;
+import com.mynotes.demo.jhipster.security.SecurityUtils;
+import com.mynotes.demo.jhipster.security.oauth2.AudienceValidator;
+import com.mynotes.demo.jhipster.security.oauth2.JwtGrantedAuthorityConverter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import io.github.jhipster.web.filter.reactive.CookieCsrfFilter;
+import org.springframework.beans.factory.annotation.Value;
+import io.github.jhipster.config.JHipsterProperties;
 import com.mynotes.demo.jhipster.web.filter.SpaWebFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcReactiveOAuth2UserService;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
+import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
+import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.zalando.problem.spring.webflux.advice.security.SecurityProblemSupport;
+import reactor.core.publisher.Mono;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
@@ -29,28 +48,16 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration {
 
-    private final ReactiveUserDetailsService userDetailsService;
+    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
+    private String issuerUri;
 
-    private final TokenProvider tokenProvider;
+    private final JHipsterProperties jHipsterProperties;
 
     private final SecurityProblemSupport problemSupport;
 
-    public SecurityConfiguration(ReactiveUserDetailsService userDetailsService, TokenProvider tokenProvider, SecurityProblemSupport problemSupport) {
-        this.userDetailsService = userDetailsService;
-        this.tokenProvider = tokenProvider;
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties, SecurityProblemSupport problemSupport) {
+        this.jHipsterProperties = jHipsterProperties;
         this.problemSupport = problemSupport;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public ReactiveAuthenticationManager reactiveAuthenticationManager() {
-        UserDetailsRepositoryReactiveAuthenticationManager authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-        authenticationManager.setPasswordEncoder(passwordEncoder());
-        return authenticationManager;
     }
 
     @Bean
@@ -62,10 +69,11 @@ public class SecurityConfiguration {
                 pathMatchers(HttpMethod.OPTIONS, "/**")
             )))
             .csrf()
-                .disable()
+                .csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
+        .and()
+            // See https://github.com/spring-projects/spring-security/issues/5766
+            .addFilterAt(new CookieCsrfFilter(), SecurityWebFiltersOrder.REACTOR_CONTEXT)
             .addFilterAt(new SpaWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
-            .addFilterAt(new JWTFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
-            .authenticationManager(reactiveAuthenticationManager())
             .exceptionHandling()
                 .accessDeniedHandler(problemSupport)
                 .authenticationEntryPoint(problemSupport)
@@ -82,11 +90,6 @@ public class SecurityConfiguration {
             .authorizeExchange()
             .pathMatchers("/").permitAll()
             .pathMatchers("/*.*").permitAll()
-            .pathMatchers("/api/register").permitAll()
-            .pathMatchers("/api/activate").permitAll()
-            .pathMatchers("/api/authenticate").permitAll()
-            .pathMatchers("/api/account/reset-password/init").permitAll()
-            .pathMatchers("/api/account/reset-password/finish").permitAll()
             .pathMatchers("/api/auth-info").permitAll()
             .pathMatchers("/api/**").authenticated()
             .pathMatchers("/services/**", "/swagger-resources/**", "/v2/api-docs").authenticated()
@@ -94,7 +97,60 @@ public class SecurityConfiguration {
             .pathMatchers("/management/info").permitAll()
             .pathMatchers("/management/prometheus").permitAll()
             .pathMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN);
+
+        http.oauth2Login()
+            .and()
+            .oauth2ResourceServer()
+                .jwt()
+                .jwtAuthenticationConverter(jwtAuthenticationConverter());
+        http.oauth2Client();
         // @formatter:on
         return http.build();
     }
+
+    Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter() {
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new JwtGrantedAuthorityConverter());
+        return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
+    }
+
+    /**
+     * Map authorities from "groups" or "roles" claim in ID Token.
+     *
+     * @return a {@link ReactiveOAuth2UserService} that has the groups from the IdP.
+     */
+    @Bean
+    public ReactiveOAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+        final OidcReactiveOAuth2UserService delegate = new OidcReactiveOAuth2UserService();
+
+        return (userRequest) -> {
+            // Delegate to the default implementation for loading a user
+            return delegate.loadUser(userRequest).map(user -> {
+                Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
+
+                user.getAuthorities().forEach(authority -> {
+                    if (authority instanceof OidcUserAuthority) {
+                        OidcUserAuthority oidcUserAuthority = (OidcUserAuthority) authority;
+                        mappedAuthorities.addAll(SecurityUtils.extractAuthorityFromClaims(oidcUserAuthority.getUserInfo().getClaims()));
+                    }
+                });
+
+                return new DefaultOidcUser(mappedAuthorities, user.getIdToken(), user.getUserInfo());
+            });
+        };
+    }
+
+    @Bean
+    ReactiveJwtDecoder jwtDecoder() {
+        NimbusReactiveJwtDecoder jwtDecoder = (NimbusReactiveJwtDecoder) ReactiveJwtDecoders.fromOidcIssuerLocation(issuerUri);
+
+        OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(jHipsterProperties.getSecurity().getOauth2().getAudience());
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+        OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+
+        jwtDecoder.setJwtValidator(withAudience);
+
+        return jwtDecoder;
+    }
+
 }

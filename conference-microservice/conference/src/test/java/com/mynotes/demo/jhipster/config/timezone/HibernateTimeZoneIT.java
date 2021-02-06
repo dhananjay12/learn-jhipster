@@ -1,6 +1,7 @@
 package com.mynotes.demo.jhipster.config.timezone;
 
 import com.mynotes.demo.jhipster.ConferenceApp;
+import com.mynotes.demo.jhipster.config.TestSecurityConfiguration;
 import com.mynotes.demo.jhipster.repository.timezone.DateTimeWrapper;
 import com.mynotes.demo.jhipster.repository.timezone.DateTimeWrapperRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for the ZoneId Hibernate configuration.
  */
-@SpringBootTest(classes = ConferenceApp.class)
+@SpringBootTest(classes = {ConferenceApp.class, TestSecurityConfiguration.class})
 public class HibernateTimeZoneIT {
 
     @Autowired

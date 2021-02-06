@@ -1,34 +1,34 @@
 package com.mynotes.demo.jhipster.web.rest.errors;
 
 import com.mynotes.demo.jhipster.GatewayApp;
+import com.mynotes.demo.jhipster.config.TestSecurityConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.junit.jupiter.api.BeforeEach;
+
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 /**
  * Integration tests {@link ExceptionTranslator} controller advice.
  */
 @WithMockUser
 @AutoConfigureWebTestClient
-@SpringBootTest(classes = GatewayApp.class)
+@SpringBootTest(classes = {GatewayApp.class, TestSecurityConfiguration.class})
 public class ExceptionTranslatorIT {
 
     @Autowired
     private WebTestClient webTestClient;
 
-    @Test
-    public void testConcurrencyFailure() {
-        webTestClient.get().uri("/api/exception-translator-test/concurrency-failure")
-            .exchange()
-            .expectStatus().isEqualTo(HttpStatus.CONFLICT)
-            .expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
-            .expectBody()
-            .jsonPath("$.message").isEqualTo(ErrorConstants.ERR_CONCURRENCY_FAILURE);
+    @BeforeEach
+    public void setupCsrf() {
+        webTestClient = webTestClient.mutateWith(csrf());
     }
 
     @Test

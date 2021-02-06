@@ -7,10 +7,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.util.context.Context;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.time.Instant;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames.ID_TOKEN;
 
 /**
  * Test class for the {@link SecurityUtils} utility class.
@@ -27,18 +28,6 @@ public class SecurityUtilsUnitTest {
             )
             .block();
         assertThat(login).isEqualTo("admin");
-    }
-
-    @Test
-    public void testgetCurrentUserJWT() {
-        String jwt = SecurityUtils.getCurrentUserJWT()
-            .subscriberContext(
-                ReactiveSecurityContextHolder.withAuthentication(
-                    new UsernamePasswordAuthenticationToken("admin", "token")
-                )
-            )
-            .block();
-        assertThat(jwt).isEqualTo("token");
     }
 
     @Test

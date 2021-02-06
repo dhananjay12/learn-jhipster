@@ -44,7 +44,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:./target/h2db/db/conference;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:conference;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: conference
     password:
     hikari:
@@ -105,14 +105,6 @@ jhipster:
   #     exposed-headers: "Authorization,Link,X-Total-Count"
   #     allow-credentials: true
   #     max-age: 1800
-  security:
-    authentication:
-      jwt:
-        # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
-        base64-secret: OGM5ZjA5YjFlZWM1NmEwMGZkNmJlMTY3YmYwOGJlYzE2MzA1OGM4MjhjNjgyMmVkNzFkOTRhZTdiNWIyN2YzYjMwZTk5ZDY4NzBkZGQ1M2U5MWZhMjViYzg2M2Y3Yjg1M2M4OWIxOWRmNzk0ZTM0YWQ5ZjBjM2M3NTc0ZDE1Mzc=
-        # Token is valid 24 hours
-        token-validity-in-seconds: 86400
-        token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://127.0.0.1:8081
   metrics:

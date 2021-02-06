@@ -5,11 +5,8 @@ import io.github.jhipster.web.util.HeaderUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.ConcurrencyFailureException;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,7 +37,6 @@ import java.util.stream.Collectors;
  * The error response follows RFC7807 - Problem Details for HTTP APIs (https://tools.ietf.org/html/rfc7807).
  */
 @ControllerAdvice
-@Component("jhiExceptionTranslator")
 public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait {
 
     private static final String FIELD_ERRORS_KEY = "fieldErrors";
@@ -110,34 +106,8 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
     }
 
     @ExceptionHandler
-    public Mono<ResponseEntity<Problem>> handleEmailAlreadyUsedException(com.mynotes.demo.jhipster.service.EmailAlreadyUsedException ex, ServerWebExchange request) {
-        EmailAlreadyUsedException problem = new EmailAlreadyUsedException();
-        return create(problem, request, HeaderUtil.createFailureAlert(applicationName,  false, problem.getEntityName(), problem.getErrorKey(), problem.getMessage()));
-    }
-
-    @ExceptionHandler
-    public Mono<ResponseEntity<Problem>> handleUsernameAlreadyUsedException(com.mynotes.demo.jhipster.service.UsernameAlreadyUsedException ex, ServerWebExchange request) {
-        LoginAlreadyUsedException problem = new LoginAlreadyUsedException();
-        return create(problem, request, HeaderUtil.createFailureAlert(applicationName,  false, problem.getEntityName(), problem.getErrorKey(), problem.getMessage()));
-    }
-
-    @ExceptionHandler
-    public Mono<ResponseEntity<Problem>> handleInvalidPasswordException(com.mynotes.demo.jhipster.service.InvalidPasswordException ex, ServerWebExchange request) {
-        return create(new InvalidPasswordException(), request);
-    }
-
-    @ExceptionHandler
     public Mono<ResponseEntity<Problem>> handleBadRequestAlertException(BadRequestAlertException ex, ServerWebExchange request) {
         return create(ex, request, HeaderUtil.createFailureAlert(applicationName, false, ex.getEntityName(), ex.getErrorKey(), ex.getMessage()));
-    }
-
-    @ExceptionHandler
-    public Mono<ResponseEntity<Problem>> handleConcurrencyFailure(ConcurrencyFailureException ex, ServerWebExchange request) {
-        Problem problem = Problem.builder()
-            .withStatus(Status.CONFLICT)
-            .with(MESSAGE_KEY, ErrorConstants.ERR_CONCURRENCY_FAILURE)
-            .build();
-        return create(ex, problem, request);
     }
 
     @Override
@@ -152,17 +122,6 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
                     .withTitle(status.getReasonPhrase())
                     .withStatus(status)
                     .withDetail("Unable to convert http message")
-                    .withCause(Optional.ofNullable(throwable.getCause())
-                        .filter(cause -> isCausalChainsEnabled())
-                        .map(this::toProblem)
-                        .orElse(null));
-            }
-            if (throwable instanceof DataAccessException) {
-                return Problem.builder()
-                    .withType(type)
-                    .withTitle(status.getReasonPhrase())
-                    .withStatus(status)
-                    .withDetail("Failure during data access")
                     .withCause(Optional.ofNullable(throwable.getCause())
                         .filter(cause -> isCausalChainsEnabled())
                         .map(this::toProblem)

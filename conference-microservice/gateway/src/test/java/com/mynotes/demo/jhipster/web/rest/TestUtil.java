@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mynotes.demo.jhipster.security.SecurityUtils;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -118,24 +118,18 @@ public final class TestUtil {
         // Test with an instance of the same class
         T domainObject2 = clazz.getConstructor().newInstance();
         assertThat(domainObject1).isNotEqualTo(domainObject2);
-        // HashCodes are equals because the objects are not persisted yet
-        assertThat(domainObject1.hashCode()).isEqualTo(domainObject2.hashCode());
     }
 
-    /**
-     * Makes a an executes a query to the EntityManager finding all stored objects.
-     * @param <T> The type of objects to be searched
-     * @param em The instance of the EntityManager
-     * @param clss The class type to be searched
-     * @return A list of all found objects
-     */
-    public static <T> List<T> findAll(EntityManager em, Class<T> clss) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<T> cq = cb.createQuery(clss);
-        Root<T> rootEntry = cq.from(clss);
-        CriteriaQuery<T> all = cq.select(rootEntry);
-        TypedQuery<T> allQuery = em.createQuery(all);
-        return allQuery.getResultList();
+    final static String ID_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" +
+        ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsIm" +
+        "p0aSI6ImQzNWRmMTRkLTA5ZjYtNDhmZi04YTkzLTdjNmYwMzM5MzE1OSIsImlhdCI6MTU0M" +
+        "Tk3MTU4MywiZXhwIjoxNTQxOTc1MTgzfQ.QaQOarmV8xEUYV7yvWzX3cUE_4W1luMcWCwpr" +
+        "oqqUrg";
+
+    public static OAuth2AuthenticationToken authenticationToken(OidcIdToken idToken) {
+        Collection<GrantedAuthority> authorities = SecurityUtils.extractAuthorityFromClaims(idToken.getClaims());
+        OidcUser user = new DefaultOidcUser(authorities, idToken);
+        return new OAuth2AuthenticationToken(user, authorities, "oidc");
     }
 
     private TestUtil() {}

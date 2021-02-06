@@ -27,8 +27,6 @@ auto-refreshes when files change on your hard drive.
 
 ```
 
-./mvnw
-
 
 npm start
 ```
@@ -114,8 +112,6 @@ To build the final jar and optimize the gateway application for production, run:
 
 ```
 
-./mvnw -Pprod clean verify
-
 
 ```
 
@@ -124,12 +120,10 @@ To ensure everything worked, run:
 
 ```
 
-java -jar target/*.jar
-
 
 ```
 
-Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
+Then navigate to [http://localhost:](http://localhost:) in your browser.
 
 Refer to [Using JHipster in production][] for more details.
 
@@ -139,8 +133,6 @@ To package your application as a war in order to deploy it to an application ser
 
 ```
 
-./mvnw -Pprod,war clean verify
-
 
 ```
 
@@ -149,7 +141,7 @@ To package your application as a war in order to deploy it to an application ser
 To launch your application's tests, run:
 
 ```
-./mvnw verify
+./gradlew test integrationTest jacocoTestReport
 ```
 
 ### Client tests
@@ -170,19 +162,9 @@ Sonar is used to analyse code quality. You can start a local Sonar server (acces
 docker-compose -f src/main/docker/sonar.yml up -d
 ```
 
-You can run a Sonar analysis with using the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the maven plugin.
+You can run a Sonar analysis with using the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner).
 
 Then, run a Sonar analysis:
-
-```
-./mvnw -Pprod clean verify sonar:sonar
-```
-
-If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties are loaded from the sonar-project.properties file.
-
-```
-./mvnw initialize sonar:sonar
-```
 
 For more information, refer to the [Code quality page][].
 
@@ -190,23 +172,23 @@ For more information, refer to the [Code quality page][].
 
 You can use Docker to improve your JHipster development experience. A number of docker-compose configuration are available in the [src/main/docker](src/main/docker) folder to launch required third party services.
 
-For example, to start a mysql database in a docker container, run:
+For example, to start a sql database in a docker container, run:
 
 ```
-docker-compose -f src/main/docker/mysql.yml up -d
+docker-compose -f src/main/docker/sql.yml up -d
 ```
 
 To stop it and remove the container, run:
 
 ```
-docker-compose -f src/main/docker/mysql.yml down
+docker-compose -f src/main/docker/sql.yml down
 ```
 
 You can also fully dockerize your application and all the services that it depends on.
 To achieve this, first build a docker image of your app by running:
 
 ```
-./mvnw -Pprod verify jib:dockerBuild
+
 ```
 
 Then run:
