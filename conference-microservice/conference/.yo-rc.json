@@ -1,0 +1,38 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.mynotes.demo.jhipster"
+    },
+    "jhipsterVersion": "6.10.5",
+    "applicationType": "microservice",
+    "baseName": "conference",
+    "packageName": "com.mynotes.demo.jhipster",
+    "packageFolder": "com/mynotes/demo/jhipster",
+    "serverPort": "8081",
+    "authenticationType": "jwt",
+    "cacheProvider": "hazelcast",
+    "enableHibernateCache": true,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "mysql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": "eureka",
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "OGM5ZjA5YjFlZWM1NmEwMGZkNmJlMTY3YmYwOGJlYzE2MzA1OGM4MjhjNjgyMmVkNzFkOTRhZTdiNWIyN2YzYjMwZTk5ZDY4NzBkZGQ1M2U5MWZhMjViYzg2M2Y3Yjg1M2M4OWIxOWRmNzk0ZTM0YWQ5ZjBjM2M3NTc0ZDE1Mzc=",
+    "embeddableLaunchScript": false,
+    "creationTimestamp": 1612620053057,
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "clientPackageManager": "npm",
+    "blueprints": [],
+    "skipClient": true,
+    "skipUserManagement": true
+  }
+}
