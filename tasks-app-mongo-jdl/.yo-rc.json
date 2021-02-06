@@ -1,0 +1,40 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.mynotes.demo.jhipster"
+    },
+    "jhipsterVersion": "6.10.5",
+    "applicationType": "monolith",
+    "baseName": "tasksAppMongo",
+    "packageName": "com.mynotes.demo.jhipster",
+    "packageFolder": "com/mynotes/demo/jhipster",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "mongodb",
+    "devDatabaseType": "mongodb",
+    "prodDatabaseType": "mongodb",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "Nzk5MGZiNWMwYmQ1NDliOGZlOWI2OTM1MmU3YzJkZmRiZGYyNTgxNDBiOGFmMGY4OWZkOTg4ZGQ3NGRiNzdkZWIyYjRlYmIxNjEyYzIyMzIwMmJiNmEzYWM0ODU2MTM3OGNlZTE3MzE5YWJlMTk1Y2Y1OWI5N2U5OTY4YTBlYWQ=",
+    "embeddableLaunchScript": false,
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "clientFramework": "angularX",
+    "clientTheme": "cyborg",
+    "clientThemeVariant": "dark",
+    "creationTimestamp": 1612589115009,
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "blueprints": []
+  }
+}
